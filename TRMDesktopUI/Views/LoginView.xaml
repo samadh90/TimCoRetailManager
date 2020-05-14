@@ -19,27 +19,31 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="64" FontFamily="Segoe UI Light" Margin="0 0 0 20">
             Login Form
         </TextBlock>
-        
+
         <!-- Username row -->
         <TextBlock Grid.Row="1" Grid.Column="1" Margin="0 0 0 10">
             Username:
         </TextBlock>
-        <TextBox x:Name="UserName" Grid.Row="1" Grid.Column="2" MinWidth="150" Margin="0 0 0 10" />
+        <TextBox x:Name="UserName" Grid.Row="1" Grid.Column="2" MinWidth="300" Margin="10 0 0 10" />
         
         <!-- Password row -->
         <TextBlock Grid.Row="2" Grid.Column="1" Margin="0 0 0 20">
             Password:
         </TextBlock>
-        <PasswordBox x:Name="Password" Grid.Row="2" Grid.Column="2" MinWidth="150" Margin="0 0 0 20" />
-        
+        <PasswordBox x:Name="Password" Grid.Row="2" Grid.Column="2" MinWidth="300" Margin="10 0 0 20" />
+
+        <!-- Error Message row -->
+        <TextBlock x:Name="ErrorMessage" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" MaxWidth="310" TextWrapping="Wrap" Foreground="Red"  Visibility="{Binding IsErrorVisible, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}" Margin="0 0 0 20"/>
+
         <!-- Login row -->
-        <Button x:Name="LogIn" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Padding="20 5">
+        <Button x:Name="LogIn" Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Padding="20 5">
             Log In
         </Button>
     </Grid>
