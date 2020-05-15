@@ -5,25 +5,22 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        #region Private Fields
-
-        private BindingList<string> _products;
-		private BindingList<string> _cart;
+		IProductEndPoint _productEndPoint;
+        private BindingList<ProductModel> _products;
+		private BindingList<ProductModel> _cart;
 		private int _itemQuantity;
-
-		#endregion
-
-		#region Public Properties
 
 		/// <summary>
 		/// Products
 		/// </summary>
-		public BindingList<string> Products
+		public BindingList<ProductModel> Products
 		{
 			get { return _products; }
 			set 
@@ -36,7 +33,7 @@ namespace TRMDesktopUI.ViewModels
 		/// <summary>
 		/// Cart
 		/// </summary>
-		public BindingList<string> Cart
+		public BindingList<ProductModel> Cart
 		{
 			get { return _cart; }
 			set
@@ -60,7 +57,22 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-		#endregion
+        public SalesViewModel(IProductEndPoint productEndPoint)
+		{
+			_productEndPoint = productEndPoint;
+		}
+
+		protected override async void OnViewLoaded(object view)
+		{
+			base.OnViewLoaded(view);
+			await LoadProducts();
+		}
+
+		private async Task LoadProducts()
+		{
+			var productList = await _productEndPoint.GetAll();
+			Products = new BindingList<ProductModel>(productList);
+		}
 
 		/// <summary>
 		/// SubTotal
