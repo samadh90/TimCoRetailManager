@@ -13,27 +13,35 @@ namespace TRMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
 		IProductEndPoint _productEndPoint;
-        private BindingList<ProductModel> _products;
-		private BindingList<ProductModel> _cart;
-		private int _itemQuantity;
 
-		/// <summary>
-		/// Products
-		/// </summary>
+
+        private BindingList<ProductModel> _products;
 		public BindingList<ProductModel> Products
 		{
 			get { return _products; }
-			set 
-			{ 
+			set
+			{
 				_products = value;
 				NotifyOfPropertyChange(() => Products);
 			}
 		}
 
-		/// <summary>
-		/// Cart
-		/// </summary>
-		public BindingList<ProductModel> Cart
+
+		private ProductModel _selectedProduct;
+		public ProductModel SelectedProduct
+		{
+			get { return _selectedProduct; }
+			set
+			{
+				_selectedProduct = value;
+				NotifyOfPropertyChange(() => SelectedProduct);
+				NotifyOfPropertyChange(() => CanAddToCart);
+			}
+		}
+
+
+		private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+		public BindingList<CartItemModel> Cart
 		{
 			get { return _cart; }
 			set
@@ -43,9 +51,8 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		/// <summary>
-		/// ItemQuantity
-		/// </summary>
+
+		private int _itemQuantity = 1;
 		public int ItemQuantity
 		{
 			get { return _itemQuantity; }
@@ -53,6 +60,7 @@ namespace TRMDesktopUI.ViewModels
 			{ 
 				_itemQuantity = value;
 				NotifyOfPropertyChange(() => ItemQuantity);
+				NotifyOfPropertyChange(() => CanAddToCart);
 			}
 		}
 
@@ -74,21 +82,23 @@ namespace TRMDesktopUI.ViewModels
 			Products = new BindingList<ProductModel>(productList);
 		}
 
-		/// <summary>
-		/// SubTotal
-		/// </summary>
+
 		public string SubTotal
 		{
 			get
 			{
 				// TODO - Replace with calculation
-				return "$0.00";
+				decimal subTotal = 0;
+
+				foreach (var item in Cart)
+				{
+					subTotal += item.Product.RetailPrice * item.QuantityInCart;
+				}
+
+				return subTotal.ToString("C");
 			}
 		}
 
-		/// <summary>
-		/// Tax
-		/// </summary>
 		public string Tax
 		{
 			get
@@ -98,9 +108,6 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		/// <summary>
-		/// Total
-		/// </summary>
 		public string Total
 		{
 			get
@@ -118,6 +125,10 @@ namespace TRMDesktopUI.ViewModels
 
 				// Make sure something is selected
 				// Make sure there is an item quantity
+				if (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity)
+				{
+					output = true;
+				}
 
 				return output;
 			}
@@ -125,7 +136,30 @@ namespace TRMDesktopUI.ViewModels
 
 		public void AddToCart()
 		{
+			CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
+			if (existingItem != null)
+			{
+				existingItem.QuantityInCart += ItemQuantity;
+				// HACK - There should be a better way of refreshing the cart display
+				Cart.Remove(existingItem);
+				Cart.Add(existingItem);
+			}
+			else
+			{
+				CartItemModel item = new CartItemModel
+				{
+					Product = SelectedProduct,
+					QuantityInCart = ItemQuantity
+				};
+
+				Cart.Add(item);
+			}
+
+
+			SelectedProduct.QuantityInStock -= ItemQuantity;
+			ItemQuantity = 1;
+			NotifyOfPropertyChange(() => SubTotal);
 		}
 
 		public bool CanRemoveFromCart
@@ -142,7 +176,7 @@ namespace TRMDesktopUI.ViewModels
 
 		public void RemoveFromCart()
 		{
-
+			NotifyOfPropertyChange(() => SubTotal);
 		}
 
 		public bool CanCheckOut
