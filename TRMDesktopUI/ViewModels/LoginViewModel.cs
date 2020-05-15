@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TRMDesktopUI.EventModels;
 using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
 
@@ -16,8 +17,11 @@ namespace TRMDesktopUI.ViewModels
 		private string _password;
 		private string _errorMessage;
 		private IAPIHelper _aPIHelper;
+		private IEventAggregator _events;
 
-		public string UserName
+        #region Public Properties
+
+        public string UserName
 		{
 			get { return _userName; }
 			set 
@@ -39,7 +43,9 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		public bool IsErrorVisible
+        #endregion
+
+        public bool IsErrorVisible
 		{
 			get 
 			{
@@ -63,9 +69,10 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		public LoginViewModel(IAPIHelper aPIHelper)
+		public LoginViewModel(IAPIHelper aPIHelper, IEventAggregator events)
 		{
 			_aPIHelper = aPIHelper;
+			_events = events;
 		}
 
 		public bool CanLogIn
@@ -90,6 +97,8 @@ namespace TRMDesktopUI.ViewModels
 				ErrorMessage = "";
 				var result = await _aPIHelper.Authenticate(UserName, Password);
 				await _aPIHelper.GetLoggedInUserInfo(result.Access_Token);
+
+				_events.PublishOnUIThread(new LogOnEvent());
 			}
 			catch (Exception ex)
 			{

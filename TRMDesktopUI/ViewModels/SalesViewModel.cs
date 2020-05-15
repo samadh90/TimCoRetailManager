@@ -14,7 +14,7 @@ namespace TRMDesktopUI.ViewModels
 
         private BindingList<string> _products;
 		private BindingList<string> _cart;
-		private string _itemQuantity;
+		private int _itemQuantity;
 
 		#endregion
 
@@ -49,7 +49,7 @@ namespace TRMDesktopUI.ViewModels
 		/// <summary>
 		/// ItemQuantity
 		/// </summary>
-		public string ItemQuantity
+		public int ItemQuantity
 		{
 			get { return _itemQuantity; }
 			set
@@ -116,7 +116,7 @@ namespace TRMDesktopUI.ViewModels
 
 		}
 
-		public bool CanRemoveFromToCart
+		public bool CanRemoveFromCart
 		{
 			get
 			{
@@ -128,7 +128,7 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		public void RemoveFromToCart()
+		public void RemoveFromCart()
 		{
 
 		}
