@@ -32,5 +32,10 @@ namespace TRMDesktopUI.Library.Models
         /// The quantity in stock for a given product.
         /// </summary>
         public int QuantityInStock { get; set; }
+
+        /// <summary>
+        /// Is taxable for a given product.
+        /// </summary>
+        public bool IsTaxable { get; set; }
     }
 }
