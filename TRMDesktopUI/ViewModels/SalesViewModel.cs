@@ -14,6 +14,7 @@ namespace TRMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
 		IProductEndPoint _productEndPoint;
+		ISaleEnPoint _saleEnPoint;
 		IConfigHelper _configHelper;
 
         private BindingList<ProductModel> _products;
@@ -66,10 +67,11 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEnPoint saleEnPoint)
 		{
 			_productEndPoint = productEndPoint;
 			_configHelper = configHelper;
+			_saleEnPoint = saleEnPoint;
 		}
 
 		protected override async void OnViewLoaded(object view)
@@ -187,6 +189,7 @@ namespace TRMDesktopUI.ViewModels
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
+			NotifyOfPropertyChange(() => CanCheckOut);
 		}
 
 		public bool CanRemoveFromCart
@@ -206,6 +209,7 @@ namespace TRMDesktopUI.ViewModels
 			NotifyOfPropertyChange(() => SubTotal);
 			NotifyOfPropertyChange(() => Tax);
 			NotifyOfPropertyChange(() => Total);
+			NotifyOfPropertyChange(() => CanCheckOut);
 		}
 
 		public bool CanCheckOut
@@ -215,14 +219,29 @@ namespace TRMDesktopUI.ViewModels
 				bool output = false;
 
 				// Make sure something is in the cart
+				if (Cart.Count > 0)
+				{
+					output = true;
+				}
 
 				return output;
 			}
 		}
 
-		public void CheckOut()
+		public async Task CheckOut()
 		{
+			SaleModel sale = new SaleModel();
 
+			foreach (var item in Cart)
+			{
+				sale.SaleDetails.Add(new SaleDetailModel
+				{
+					ProductId = item.Product.Id,
+					Quantity = item.QuantityInCart
+				});
+			}
+
+			await _saleEnPoint.PostSale(sale);
 		}
 	}
 }
