@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,17 +9,20 @@ using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
+using TRMDesktopUI.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
 		IProductEndPoint _productEndPoint;
-		ISaleEnPoint _saleEnPoint;
+		ISaleEnPoint _saleEndPoint;
 		IConfigHelper _configHelper;
+		IMapper _mapper;
 
-        private BindingList<ProductModel> _products;
-		public BindingList<ProductModel> Products
+
+		private BindingList<ProductDisplayModel> _products;
+		public BindingList<ProductDisplayModel> Products
 		{
 			get { return _products; }
 			set
@@ -29,8 +33,8 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-		private ProductModel _selectedProduct;
-		public ProductModel SelectedProduct
+		private ProductDisplayModel _selectedProduct;
+		public ProductDisplayModel SelectedProduct
 		{
 			get { return _selectedProduct; }
 			set
@@ -42,8 +46,8 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-		private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
-		public BindingList<CartItemModel> Cart
+		private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();
+		public BindingList<CartItemDisplayModel> Cart
 		{
 			get { return _cart; }
 			set
@@ -67,11 +71,12 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEnPoint saleEnPoint)
+        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEnPoint saleEnPoint, IMapper mapper)
 		{
 			_productEndPoint = productEndPoint;
 			_configHelper = configHelper;
-			_saleEnPoint = saleEnPoint;
+			_saleEndPoint = saleEnPoint;
+			_mapper = mapper;
 		}
 
 		protected override async void OnViewLoaded(object view)
@@ -83,7 +88,8 @@ namespace TRMDesktopUI.ViewModels
 		private async Task LoadProducts()
 		{
 			var productList = await _productEndPoint.GetAll();
-			Products = new BindingList<ProductModel>(productList);
+			var products = _mapper.Map<List<ProductDisplayModel>>(productList);
+			Products = new BindingList<ProductDisplayModel>(products);
 		}
 
 
@@ -163,7 +169,7 @@ namespace TRMDesktopUI.ViewModels
 
 		public void AddToCart()
 		{
-			CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+			CartItemDisplayModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
 			if (existingItem != null)
 			{
@@ -174,7 +180,7 @@ namespace TRMDesktopUI.ViewModels
 			}
 			else
 			{
-				CartItemModel item = new CartItemModel
+				CartItemDisplayModel item = new CartItemDisplayModel
 				{
 					Product = SelectedProduct,
 					QuantityInCart = ItemQuantity
@@ -241,7 +247,7 @@ namespace TRMDesktopUI.ViewModels
 				});
 			}
 
-			await _saleEnPoint.PostSale(sale);
+			await _saleEndPoint.PostSale(sale);
 		}
 	}
 }
