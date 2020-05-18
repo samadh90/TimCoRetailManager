@@ -17,6 +17,7 @@ namespace TRMDesktopUI.Library.Api
         private HttpClient _apiClient;
         public ILoggedInUserModel _loggedInUser { get; set; }
 
+
         public APIHelper(ILoggedInUserModel loggedInUser)
         {
             InitializeClient();
@@ -63,6 +64,11 @@ namespace TRMDesktopUI.Library.Api
                     throw new Exception(response.ReasonPhrase);
                 }
             }
+        }
+
+        public void LogOffUser()
+        {
+            _apiClient.DefaultRequestHeaders.Clear();
         }
 
         public async Task GetLoggedInUserInfo(string token)
