@@ -12,6 +12,7 @@ namespace TRMDataManager.Controllers
     [Authorize]
     public class InventoryController : ApiController
     {
+        [Authorize(Roles = "Manager,Admin")]
         public List<InventoryModel> GetSalesReport()
         {
             InventoryData data = new InventoryData();
@@ -19,6 +20,7 @@ namespace TRMDataManager.Controllers
             return data.GetInventory();
         }
 
+        [Authorize(Roles = "Admin")]
         public void Post(InventoryModel item)
         {
             InventoryData data = new InventoryData();
