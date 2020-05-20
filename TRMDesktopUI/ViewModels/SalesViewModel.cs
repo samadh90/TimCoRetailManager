@@ -3,9 +3,11 @@ using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
@@ -19,6 +21,53 @@ namespace TRMDesktopUI.ViewModels
 		ISaleEnPoint _saleEndPoint;
 		IConfigHelper _configHelper;
 		IMapper _mapper;
+		private readonly StatusInfoViewModel _status;
+		private readonly IWindowManager _window;
+
+		public SalesViewModel(
+			IProductEndPoint productEndPoint,
+			IConfigHelper configHelper,
+			ISaleEnPoint saleEnPoint,
+			IMapper mapper,
+			StatusInfoViewModel status,
+			IWindowManager window)
+		{
+			this._productEndPoint = productEndPoint;
+			this._configHelper = configHelper;
+			this._saleEndPoint = saleEnPoint;
+			this._mapper = mapper;
+			this._status = status;
+			this._window = window;
+		}
+
+		protected override async void OnViewLoaded(object view)
+		{
+			base.OnViewLoaded(view);
+			try
+			{
+				await LoadProducts();
+			}
+			catch (Exception ex)
+			{
+				dynamic settings = new ExpandoObject();
+				settings.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+				settings.ResizeMode = ResizeMode.NoResize;
+				settings.Title = "System Error";
+
+				if (ex.Message == "Unauthorized")
+				{
+					_status.UpdateMesasge("Unauthorized Access", "You do not have permission to interact with Sales Form.");
+					_window.ShowDialog(_status, null, settings);
+				}
+				else
+				{
+					_status.UpdateMesasge("UFatal exception", ex.Message);
+					_window.ShowDialog(_status, null, settings);
+				}
+
+				TryClose();
+			}
+		}
 
 
 		private BindingList<ProductDisplayModel> _products;
@@ -97,19 +146,7 @@ namespace TRMDesktopUI.ViewModels
 		}
 
 
-        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEnPoint saleEnPoint, IMapper mapper)
-		{
-			_productEndPoint = productEndPoint;
-			_configHelper = configHelper;
-			_saleEndPoint = saleEnPoint;
-			_mapper = mapper;
-		}
 
-		protected override async void OnViewLoaded(object view)
-		{
-			base.OnViewLoaded(view);
-			await LoadProducts();
-		}
 
 		private async Task LoadProducts()
 		{
