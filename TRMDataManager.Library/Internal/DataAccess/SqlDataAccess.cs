@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManager.Library.Internal.DataAccess
 {
-    internal class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         private IDbConnection _connection;
         private IDbTransaction _transaction;
@@ -28,7 +28,7 @@ namespace TRMDataManager.Library.Internal.DataAccess
         {
             return _config.GetConnectionString(name);
         }
-        
+
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
         {
