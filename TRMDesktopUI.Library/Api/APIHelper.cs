@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Models;
-using TRMDesktopUI.Models;
 
 namespace TRMDesktopUI.Library.Api
 {
