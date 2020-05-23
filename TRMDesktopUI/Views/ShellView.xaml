@@ -13,7 +13,8 @@
             </MenuItem>
 
             <MenuItem Header="_Users" Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed}">
-                <MenuItem x:Name="UserManagement" Header="User_Management" />
+                <MenuItem x:Name="UserManagement" Header="User _Management" />
+                <MenuItem x:Name="SalesPage" Header="_Sales Page"/>
             </MenuItem>
             
             <MenuItem Header="_Account" >
